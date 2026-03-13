@@ -31,7 +31,7 @@ agent:
 codex:
   command: codex --config shell_environment_policy.inherit=all --config model_reasoning_effort=xhigh --model gpt-5.3-codex app-server
   approval_policy: never
-  thread_sandbox: workspace-write
+  thread_sandbox: workspaceWrite
   turn_sandbox_policy:
     type: workspaceWrite
 ---

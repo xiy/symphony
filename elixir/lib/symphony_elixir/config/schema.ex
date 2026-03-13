@@ -169,7 +169,7 @@ defmodule SymphonyElixir.Config.Schema do
         }
       )
 
-      field(:thread_sandbox, :string, default: "workspace-write")
+      field(:thread_sandbox, :string, default: "workspaceWrite")
       field(:turn_sandbox_policy, :map)
       field(:turn_timeout_ms, :integer, default: 3_600_000)
       field(:read_timeout_ms, :integer, default: 5_000)
@@ -380,6 +380,7 @@ defmodule SymphonyElixir.Config.Schema do
     codex = %{
       settings.codex
       | approval_policy: normalize_keys(settings.codex.approval_policy),
+        thread_sandbox: normalize_thread_sandbox(settings.codex.thread_sandbox),
         turn_sandbox_policy: normalize_optional_map(settings.codex.turn_sandbox_policy)
     }
 
@@ -397,6 +398,11 @@ defmodule SymphonyElixir.Config.Schema do
 
   defp normalize_optional_map(nil), do: nil
   defp normalize_optional_map(value) when is_map(value), do: normalize_keys(value)
+
+  defp normalize_thread_sandbox("danger-full-access"), do: "dangerFullAccess"
+  defp normalize_thread_sandbox("read-only"), do: "readOnly"
+  defp normalize_thread_sandbox("workspace-write"), do: "workspaceWrite"
+  defp normalize_thread_sandbox(value), do: value
 
   defp normalize_key(value) when is_atom(value), do: Atom.to_string(value)
   defp normalize_key(value), do: to_string(value)
