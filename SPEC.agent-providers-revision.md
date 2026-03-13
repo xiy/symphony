@@ -146,6 +146,7 @@ providers:
     - provider_rate_limited
     - provider_quota_exhausted
     - provider_startup_failed
+    - provider_transient_transport_error
   entries:
     codex:
       kind: codex
@@ -184,6 +185,8 @@ Notes:
 - Command names are illustrative. The spec defines normalized behavior, not vendor CLI spelling.
 - `entries` must contain at least one enabled provider after environment resolution.
 - `default` must reference an enabled provider.
+- Every `fallback_on` value must be one of the canonical provider failure categories defined in
+  Section 4.7.
 
 #### 4.3.2 Routing Policy Block
 
@@ -368,21 +371,28 @@ Runtime snapshot additions:
 
 ### 4.7 Failure Model Revision
 
-Extend Section 14 with provider-specific classes:
+Extend Section 14 with canonical provider-specific classes:
 
 1. `provider_config_error`
 2. `provider_auth_missing`
-3. `provider_protocol_error`
+3. `provider_startup_failed`
 4. `provider_unavailable`
-5. `provider_rate_limited`
-6. `provider_quota_exhausted`
-7. `provider_capability_mismatch`
+5. `provider_transient_transport_error`
+6. `provider_protocol_error`
+7. `provider_rate_limited`
+8. `provider_quota_exhausted`
+9. `provider_capability_mismatch`
 
 Recovery rules:
 
 - Config/auth errors fail preflight or fail the run without retrying that provider.
+- Startup failures and provider-unavailable signals may fallback immediately and should open a
+  provider cooldown window.
+- Transient transport errors may fallback immediately and should increment provider health
+  penalties.
+- Protocol errors indicate adapter or provider contract drift; they may fallback immediately but
+  should also increment provider health penalties.
 - Rate-limit and quota failures open provider cooldown and allow fallback or later retry.
-- Protocol errors may fallback immediately but should also increment provider health penalties.
 - A run that exhausts all eligible providers should surface one normalized failure summarizing the
   attempted providers and their terminal categories.
 
