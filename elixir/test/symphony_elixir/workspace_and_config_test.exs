@@ -754,7 +754,7 @@ defmodule SymphonyElixir.WorkspaceAndConfigTest do
              }
            }
 
-    assert config.codex.thread_sandbox == "workspace-write"
+    assert config.codex.thread_sandbox == "workspaceWrite"
 
     assert {:ok, canonical_default_workspace_root} =
              SymphonyElixir.PathSafety.canonicalize(Path.join(System.tmp_dir!(), "symphony_workspaces"))
@@ -790,7 +790,7 @@ defmodule SymphonyElixir.WorkspaceAndConfigTest do
     write_workflow_file!(Workflow.workflow_file_path(),
       workspace_root: explicit_root,
       codex_approval_policy: "on-request",
-      codex_thread_sandbox: "workspace-write",
+      codex_thread_sandbox: "workspaceWrite",
       codex_turn_sandbox_policy: %{
         type: "workspaceWrite",
         writableRoots: [explicit_workspace, explicit_cache]
@@ -799,7 +799,7 @@ defmodule SymphonyElixir.WorkspaceAndConfigTest do
 
     config = Config.settings!()
     assert config.codex.approval_policy == "on-request"
-    assert config.codex.thread_sandbox == "workspace-write"
+    assert config.codex.thread_sandbox == "workspaceWrite"
 
     assert Config.codex_turn_sandbox_policy(explicit_workspace) == %{
              "type" => "workspaceWrite",

@@ -1493,7 +1493,7 @@ defmodule SymphonyElixir.CoreTest do
 
                    payload["method"] == "thread/start" &&
                      get_in(payload, ["params", "approvalPolicy"]) == expected_approval_policy &&
-                     get_in(payload, ["params", "sandbox"]) == "workspace-write" &&
+                     get_in(payload, ["params", "sandbox"]) == "workspaceWrite" &&
                      get_in(payload, ["params", "cwd"]) == canonical_workspace
                  end)
                else
@@ -1716,7 +1716,7 @@ defmodule SymphonyElixir.CoreTest do
                  |> then(fn payload ->
                    payload["method"] == "thread/start" &&
                      get_in(payload, ["params", "approvalPolicy"]) == "on-request" &&
-                     get_in(payload, ["params", "sandbox"]) == "workspace-write"
+                     get_in(payload, ["params", "sandbox"]) == "workspaceWrite"
                  end)
                else
                  false
@@ -1745,5 +1745,16 @@ defmodule SymphonyElixir.CoreTest do
     after
       File.rm_rf(test_root)
     end
+  end
+
+  test "legacy thread sandbox spellings are normalized to the current Codex enum values" do
+    write_workflow_file!(Workflow.workflow_file_path(), codex_thread_sandbox: "workspace-write")
+    assert Config.settings!().codex.thread_sandbox == "workspaceWrite"
+
+    write_workflow_file!(Workflow.workflow_file_path(), codex_thread_sandbox: "read-only")
+    assert Config.settings!().codex.thread_sandbox == "readOnly"
+
+    write_workflow_file!(Workflow.workflow_file_path(), codex_thread_sandbox: "danger-full-access")
+    assert Config.settings!().codex.thread_sandbox == "dangerFullAccess"
   end
 end
